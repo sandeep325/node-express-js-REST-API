@@ -10,11 +10,11 @@ const product = require("../models/product");
 
 router.get("/", (req, res, next) => {
 
-    Order.find().select("_id product quantity name ").populate("product" ,"name price").sort({ _id: -1 })
+    Order.find().select("_id product quantity name ").populate("product", "name price").sort({ _id: -1 })
         .exec()
         .then(result => {
             res.status(200).json({
-                status:200,
+                status: 200,
                 countOrder: result.length,
                 message: 'All order are fetch successfully...',
                 orders: result.map(data => {
@@ -51,16 +51,16 @@ router.get("/:orderId", (req, res, next) => {
         .exec()
         .then(result => {
 
-            if(!result) {
+            if (!result) {
                 return res.status(404).json({
-                    status:404,
-                    message:`Order not found for id:${id}`
+                    status: 404,
+                    message: `Order not found for id:${id}`
                 });
             }
             res.status(200).json({
-                status:200,
-                message:`order fetch by id:${id}`,
-                order:{
+                status: 200,
+                message: `order fetch by id:${id}`,
+                order: {
                     _id: result._id,
                     product: result.product,
                     name: result.name,
@@ -70,7 +70,7 @@ router.get("/:orderId", (req, res, next) => {
                         url: 'http://localhost:8080/orders'
                     }
                 }
-               
+
 
             });
         }).catch(err => {
@@ -100,7 +100,7 @@ router.post("/addorders", (req, res, next) => {
 
         order.save().then(result => {
             res.status(201).json({
-                status:201,
+                status: 201,
                 message: 'You have successfully order...',
                 order: {
                     _id: result._id,
@@ -137,19 +137,20 @@ router.delete("/delete-orders/:orderId", (req, res, next) => {
         .exec()
         .then(result => {
             if (result.deletedCount == 1) {
-                res.status(200).json({ 
-                    status:200,
-                    deletedCount:result.deletedCount,
-                    message: 'Your order is successfully deleted...',                 
-                    
-                 });
+                res.status(200).json({
+                    status: 200,
+                    deletedCount: result.deletedCount,
+                    message: 'Your order is successfully deleted...',
+
+                });
 
             } else {
                 res.status(200).json({
-                    status:404,
-                    deletedCount:result.deletedCount,
-                     message: 'Your order could not deleted please try again...', 
-                     result });
+                    status: 204,
+                    deletedCount: result.deletedCount,
+                    message: 'Your order could not deleted please try again...',
+                    result
+                });
 
             }
 
@@ -169,31 +170,31 @@ router.put('/update-orders/:orderId', (req, res, next) => {
         orderU[odr.propName] = odr.value;
     }
 
-    Order.updateOne({_id:id},{$set:orderU})
+    Order.updateOne({ _id: id }, { $set: orderU })
         .exec()
         .then(result => {
-            if(result.acknowledged == true && result.modifiedCount == 1) {
-            res.status(200).json({
-                status:200,
-                message: 'Your order is updated successfully...',
-                data: {
-                    _id: id,
-                    request: {
-                        type: 'GET',
-                        url: `http://localhost:8080/orders/${id}`
+            if (result.acknowledged == true && result.modifiedCount == 1) {
+                res.status(200).json({
+                    status: 200,
+                    message: 'Your order is updated successfully...',
+                    data: {
+                        _id: id,
+                        request: {
+                            type: 'GET',
+                            url: `http://localhost:8080/orders/${id}`
+                        }
                     }
-                }
-            });
+                });
 
             } else {
 
                 res.status(200).json({
-                    status:404,
+                    status: 204,
                     message: 'Your order is not  updated or already updated...',
                 });
 
-             }
-            
+            }
+
         })
         .catch(err => {
             res.status(500).json({ error: err });

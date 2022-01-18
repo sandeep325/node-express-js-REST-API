@@ -1,10 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-// const product = require("../models/product");
+const product = require("../models/product");
 const Product = require("../models/product");
-const multer = require("multer");
 
+// ===========================this for images upload=============================================
+
+
+const multer = require("multer");
 const fileFilter = (req, file, cb) => {
 
     if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' || file.mimetype === 'image/jpg') {
@@ -26,6 +29,15 @@ const upload = multer({
     },
     fileFilter: fileFilter,
 });
+
+
+// ===========================this for images upload  end=============================================
+
+
+
+
+
+
 // ===========================================PRODUCT  ALL Listing REST-API  START=========================================================================
 router.get("/", (req, res, next) => {
 
@@ -67,7 +79,7 @@ router.get("/:productId", (req, res, next) => {
     const id = req.params.productId;
     if (id) {
 
-        Product.findById(id).select("name price _id productImage ").exec().then(dat => {
+        Product.findById(id).select("name price _id ").exec().then(dat => {
             if (dat) {
                 // console.log('data from database',dat);
                 res.status(200).json({
@@ -88,7 +100,7 @@ router.get("/:productId", (req, res, next) => {
 
             } else {
 
-                res.status(404).json({ message: `No data found for id :${id}` });
+                res.status(404).json({ status:404,message: `No data found for id :${id}` });
 
             }
 
@@ -108,14 +120,15 @@ router.get("/:productId", (req, res, next) => {
 
 // ===========================================PRODUCT ADD RESTAPI  START=========================================================================
 
-router.post("/addproducts", upload.single('productImage'), (req, res, next) => {
+router.post("/addproducts",  (req, res, next) => {
     // const product =  req.body;
     // console.log(req.file);
     const product = new Product({
         _id: new mongoose.Types.ObjectId(),
         name: req.body.name,
         price: req.body.price,
-        productImage: req.file.path,
+
+        // productImage: req.file.path,
     });
     product.save().then(result => {
         res.status(201).json({
@@ -161,13 +174,14 @@ router.delete("/delete-products/:ProductId", (req, res, next) => {
 
         }
         else {
+           return res.status(200).json({
+                status: 204,
+                deletedCount: dat.deletedCount,
+                message: 'Product Not Found on db.',
+            });
 
         }
-        res.status(200).json({
-            status: 404,
-            deletedCount: dat.deletedCount,
-            message: 'Product Not Found on db.',
-        });
+        
     })
         .catch(err => {
             console.log(err);
@@ -215,7 +229,7 @@ router.put("/update-product/:productId", (req, res, next) => {
             } else {
                 console.log(result);
                 res.status(200).json({
-                    status: 400,
+                    status: 204,
                     modifiedCount: result.modifiedCount,
                     message: 'Product Could not update...',
                     products: {
