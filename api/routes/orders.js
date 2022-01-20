@@ -3,12 +3,13 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const Order = require("../models/order");
 const product = require("../models/product");
-
-
+const checkUserAuth = require("../middleware/Auth");
+const multer = require('multer');
+const upload = multer();
 
 // =======================================GET ORDER List REST-API START=========================================================
 
-router.get("/", (req, res, next) => {
+router.get("/", checkUserAuth, upload.none(),  (req, res, next) => {
 
     Order.find().select("_id product quantity name ").populate("product", "name price").sort({ _id: -1 })
         .exec()
@@ -45,7 +46,7 @@ router.get("/", (req, res, next) => {
 
 
 // =======================================GET ORDER DETAIL BYID REST-API END=========================================================
-router.get("/:orderId", (req, res, next) => {
+router.get("/:orderId", checkUserAuth, upload.none(), (req, res, next) => {
     const id = req.params.orderId;
     Order.findById({ _id: id }).select("_id product name quantity")
         .exec()
@@ -87,7 +88,7 @@ router.get("/:orderId", (req, res, next) => {
 
 
 // =======================================POST ORDER REST-API START=========================================================
-router.post("/addorders", (req, res, next) => {
+router.post("/addorders", checkUserAuth, upload.none(), (req, res, next) => {
     // res.json(req.body); return false;
     const order = new Order({
         _id: new mongoose.Types.ObjectId(),
@@ -129,7 +130,7 @@ router.post("/addorders", (req, res, next) => {
 
 
 // =======================================DELETE ORDER REST-API START=========================================================
-router.delete("/delete-orders/:orderId", (req, res, next) => {
+router.delete("/delete-orders/:orderId", checkUserAuth, upload.none(), (req, res, next) => {
     const id = req.params.orderId;
     //   res.status(200).json(id); return false;
 
@@ -163,7 +164,7 @@ router.delete("/delete-orders/:orderId", (req, res, next) => {
 
 
 // =======================================UPDATE ORDER REST-API START=========================================================
-router.put('/update-orders/:orderId', (req, res, next) => {
+router.put('/update-orders/:orderId', checkUserAuth, upload.none(), (req, res, next) => {
     const id = req.params.orderId;
     const orderU = {};
     for (odr of req.body) {
