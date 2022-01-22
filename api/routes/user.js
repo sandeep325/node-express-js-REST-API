@@ -5,8 +5,10 @@ const router = express.Router();
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const multer = require('multer');
+const upload = multer();
 // ==================================REST API FOR USER SIGNUP START===================================================
-router.post('/signup', (req, res, next) => {
+router.post('/signup', upload.none(), (req, res, next) => {
     // res.send("hello user");
     // check if mail is exist
     User.find({ email: req.body.email })
@@ -70,7 +72,7 @@ router.post('/signup', (req, res, next) => {
 
 // ==================================REST API FOR USER LOGIN END===================================================
 
-router.post("/userlogin", (req, res, next) => {
+router.post("/userlogin", upload.none(), (req, res, next) => {
     // res.send("test");
     User.find({ email: req.body.email }).exec()
         .then(userdata => {
